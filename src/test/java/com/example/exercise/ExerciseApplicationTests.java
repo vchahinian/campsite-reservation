@@ -80,6 +80,4 @@ class ExerciseApplicationTests {
 		Exception exception = assertThrows(InvalidReservation.class, testReservation::save);
 		assertEquals("Date must be at least 1 day before and a maximum 1 month in advance", exception.getMessage());
 	}
-
-
 }

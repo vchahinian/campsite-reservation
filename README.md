@@ -29,9 +29,9 @@ Design a campsite reservation system using a REST API design.
 * tomcat 9
 
 ### Assumptions
-The dates are strings that are properly formatted like so YYYY-MM-DD
-The same customer cannot create 2 reservations on the same dates
-Customer emails are unique to the customer. In other words 2 different customers cannot have the same email.
+* The dates are strings that are properly formatted like so YYYY-MM-DD
+* The same customer cannot create 2 reservations on the same dates
+* Customer emails are unique to the customer. In other words 2 different customers cannot have the same email.
 
 ### Design
 I have created a CampsiteReservation class that stores all the information that we need for a reservation: startDate, endDate, reference, fullName.
@@ -43,32 +43,36 @@ Requests and responses of the endpoints are in json format
 
 I have added an index on the reference column so that we can handle a high volume of reads. This is mainly for when a customer would like to see their reservations or when they would like to make an update.
 I have also created a multi column index on the start_date and end_date column in order to handle high volume on the get availability endpoint.
-The mysql dump is in the main folder and it's called challenge-db.sql
-### Testing
-Currently, I only have unit basic unit tests to handle the base cases of the exercises. There is also unit tests that will handle concurrency issues.
-There should also be User acceptance testing and system testing to ensure that we are truly delivering what the client wants.
+The mysql dump is in the main folder and it's called challenge-db.sql.
 
-### Edge cases handled
+### Testing
+Currently, I only have unit basic tests to handle the base cases of the exercises. There is also unit tests that will handle concurrency issues.
+I would have added more unit tests for a better test coverage, but I was short on time.
+There should also be user acceptance testing and system testing to ensure that we are truly delivering what the client wants.
+
+### Additional Handled Edge Cases
 * Reservation date must be in the future
 * Reservation date must be at least 1 day long
-* Reservation date must be at least 1 day before and up to 1 month in advance
 
+## Enhancements
+I have added this section since I would add these improvements if I had more time
 
-## Improvements
-
-* Use a proper ORM, it has down sides however it does speed up development and optimize queries behind the scenes. I made a very basic ORM in this case. 
+### General
+* Need to use an ORM, it has down sides however it will speed up development and optimize queries behind the scenes.
     * One downside is that an ORM will abstract out logic which can cause unexpected behaviour 
-* Use a more proper JUnit test, maybe in a memory db so that it gets erased after each run of the test. It will be also faster.
-* A better solution would be using a queueing system. That way we can queue up all the requests in the order they came in and then handle them 1 by 1. This way we won’t need to block other write operations on the database. This solution might slow things down when it comes to the creation of new reservations however it will speed up all write operations overall.
-* The date format is valid. Should check for nulls. Should validate the format.
-* Singleton thread pooling for db connection. Since closing and opening the db connection all the time is inefficient.
+* A better solution would be using a queueing system. That way we can queue up all the requests in the order they came in and then handle them 1 by 1. This way we won’t need to block other write operations on the database table. This solution might slow things down when it comes to the creation of new reservations however it will speed up write operations overall.
+* Should validate date formats and check for nulls.
+* Could use a Singleton thread pooling design for getting the db connection. Since closing and opening the db connection all the time is inefficient.
+
+### Tests
+* Use a more proper JUnit test, an in memory db would be better since it would be faster and it would get erased after each run of tests
+* Furthermore, I would add integration tests to test the endpoints themselves as opposed to testing all the functions that they use.
 
 ### DB design
 It would be better to store the customer information in a separate table with a foreign key to associate the customer table to the schedule table. That way the customer can update their email or name if they want without messing up the reservation.
 
 ### Security
-
-* Encrypt all credentials in the repository.
+* Encrypt all credentials in the GIT repository. We can also not store the credentials in GIT and store it in a more secure location, which would be a better solution.
 * Implement an authentication method
     * I would use a shared token strategy where we would give a secret token to our client so that they can use that to encrypt the data coming to us in the endpoint. We would be able to decrypt the data to ensure that we have a real customer attempting to create or modify the data. This strategy would require a customer to have created an account before creating a reservation.
     * Another strategy would be a simpler token based approach where the toke needs to be sent in the request header however this is less secure since that token can get stolen and compromise the whole system.
