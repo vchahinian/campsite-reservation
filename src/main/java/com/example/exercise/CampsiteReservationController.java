@@ -19,13 +19,13 @@ public class CampsiteReservationController {
     public ResponseEntity getAllCampsiteReservations(@RequestParam(name="startDate", required=false) String startDate, @RequestParam(name="endDate", required=false) String endDate) {
         if (startDate != null){
             try {
-                return ResponseEntity.status(HttpStatus.OK).body(CampsiteReservation.getAllReservationsByDateRange(startDate, endDate));
+                return ResponseEntity.status(HttpStatus.OK).body(CampsiteReservation.getAllAvailabilitiesByDateRange(startDate, endDate));
             } catch (SQLException throwables) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected Error. Please contact the Administrator.");
             }
         }else{
             try {
-                return ResponseEntity.status(HttpStatus.OK).body(CampsiteReservation.getAllReservations());
+                return ResponseEntity.status(HttpStatus.OK).body(CampsiteReservation.getAllAvailabilities());
             } catch (SQLException throwables) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Unexpected Error. Please contact the Administrator.");
             }

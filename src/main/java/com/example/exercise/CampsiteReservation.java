@@ -21,6 +21,7 @@ public class CampsiteReservation {
     private String fullName;
     private String email;
 
+    // Setters
     public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
@@ -42,7 +43,9 @@ public class CampsiteReservation {
         return DriverManager.getConnection(url, user, password);
     }
 
-
+    // This function is the constructor that creates a new CampsiteReservation it does not insert it into the database yet.
+    // I made the campsite reservation reference unique by hashing the following fields together: email, startDate, endDate
+    // The assumption is that the same customer cannot make the same reservation twice on the same date
     public CampsiteReservation(String startDate, String endDate, String fullName, String email) throws NoSuchAlgorithmException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate parsedStartDate = LocalDate.parse(startDate, formatter);
@@ -80,9 +83,16 @@ public class CampsiteReservation {
     public void validateReservation(Connection conn) throws InvalidReservation, SQLException {
         LocalDate currentDate = LocalDate.now();
         long noOfDaysBetween = ChronoUnit.DAYS.between(startDate, endDate);
+        long noOfDaysInTheFuture = ChronoUnit.DAYS.between(currentDate, startDate);
+
+
+        // Reservation must be at least 1 day
+        if (noOfDaysBetween == 0) {
+            throw new InvalidReservation("You must pick a date that is at least 1 day long" );
+        }
 
         // Reservation cannot be more than 3 days
-        if (noOfDaysBetween > 0) {
+        if (noOfDaysInTheFuture < 0) {
             throw new InvalidReservation("You must pick a date that is in the future" );
         }
 
@@ -90,7 +100,6 @@ public class CampsiteReservation {
         if (noOfDaysBetween > 3) {
             throw new InvalidReservation("You can only reserve a maximum of 3 days" );
         }
-
 
 
         noOfDaysBetween = ChronoUnit.DAYS.between(currentDate, startDate);
@@ -126,8 +135,8 @@ public class CampsiteReservation {
         }
         statement.close();
     }
-
-    public static String getAllReservations() throws SQLException {
+    // Returns all available timeslots for the next month
+    public static String getAllAvailabilities() throws SQLException {
         JSONArray jsonArray = new JSONArray();
 
         LocalDate current = LocalDate.now();
@@ -178,7 +187,8 @@ public class CampsiteReservation {
         return jsonArray.toString();
     }
 
-    public static String getAllReservationsByDateRange(String startDate, String endDate) throws SQLException {
+    // Returns all available date ranges within the start date and end date provided
+    public static String getAllAvailabilitiesByDateRange(String startDate, String endDate) throws SQLException {
         JSONArray jsonArray = new JSONArray();
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -200,6 +210,8 @@ public class CampsiteReservation {
 
             ArrayList<LocalDate[]> availableRange = new ArrayList<LocalDate[]>();
             LocalDate previousEndDate = null;
+
+            // In the following algorithm we are getting all the available dates instead of all teh currently booked dates
             while (rs.next())
             {
                 LocalDate rsStartDate = rs.getDate("start_date").toLocalDate();
@@ -231,6 +243,8 @@ public class CampsiteReservation {
         return jsonArray.toString();
     }
 
+    // Inserts the CampsiteReservation in the schedule database table while validating that the data is correct
+    // The mysql call has a pessimistic write lock on it so that 2 threads cannot insert into that table at the same time
     public String save() throws InvalidReservation, SQLException {
         java.sql.Date sqlStartDate = java.sql.Date.valueOf(startDate);
         java.sql.Date sqlEndDate = java.sql.Date.valueOf(endDate);
@@ -277,6 +291,8 @@ public class CampsiteReservation {
         return reference;
     }
 
+    // Updates the CampsiteReservation in the schedule database table while validating that the data is correct
+    // The mysql call has a pessimistic write lock on it so that 2 threads cannot update and insert into the same date range
     public void update() throws SQLException, InvalidReservation {
 
         java.sql.Date sqlStartDate = java.sql.Date.valueOf(startDate);
@@ -323,6 +339,7 @@ public class CampsiteReservation {
         }
     }
 
+    // Deletes the schedule db row that has the reference provided
     public static void delete(String reference) throws SQLException {
         Connection conn = getConnection();
         PreparedStatement statement = conn.prepareStatement("Delete from schedule where reference = ?");
@@ -330,6 +347,7 @@ public class CampsiteReservation {
         statement.execute();
     }
 
+    // Retrieves the CampsiteReservation has the reference provided
     public static CampsiteReservation getReservationByReference(String reference) throws SQLException {
         Connection conn = getConnection();
 

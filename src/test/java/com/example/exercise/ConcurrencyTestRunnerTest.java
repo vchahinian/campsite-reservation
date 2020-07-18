@@ -26,7 +26,7 @@ class ConcurrentTestRunnerTest {
     @Test
     public void shouldRunInParallel1() {
         try {
-            CampsiteReservation reservation1 = new CampsiteReservation("2020-07-17", "2020-07-20", "Sample1 Name", "sample1@email.com");
+            CampsiteReservation reservation1 = new CampsiteReservation("2020-08-17", "2020-08-20", "Sample1 Name", "sample1@email.com");
             reservation1.save();
         } catch (NoSuchAlgorithmException | SQLException | InvalidReservation e) {
             e.printStackTrace();
@@ -37,7 +37,7 @@ class ConcurrentTestRunnerTest {
     @Test
     public void shouldRunInParallel2() {
         try {
-            CampsiteReservation reservation2 = new CampsiteReservation("2020-07-17", "2020-07-20", "Sample2 Name", "sample2@email.com");
+            CampsiteReservation reservation2 = new CampsiteReservation("2020-08-17", "2020-08-20", "Sample2 Name", "sample2@email.com");
             reservation2.save();
 
         } catch (NoSuchAlgorithmException | SQLException | InvalidReservation e) {
@@ -49,7 +49,7 @@ class ConcurrentTestRunnerTest {
     @Test
     public void shouldRunInParallel3() {
         try {
-            CampsiteReservation reservation3 = new CampsiteReservation("2020-07-17", "2020-07-20", "Sample3 Name", "sample3@email.com");
+            CampsiteReservation reservation3 = new CampsiteReservation("2020-08-17", "2020-08-20", "Sample3 Name", "sample3@email.com");
             reservation3.save();
         } catch (NoSuchAlgorithmException | SQLException | InvalidReservation e) {
             e.printStackTrace();
