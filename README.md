@@ -1,7 +1,7 @@
 # Upgrade Coding Challenge
 
 ## Introduction
-My name is Vahe Chahinian, and I haven't coded in Java since university (2012). However, I was able to pick things up quickly and here is what I came up. It was quite challenging due to my time constraints with work and family.
+My name is Vahe Chahinian, and I haven't coded in Java since university (2012). However, I was able to pick things up quickly and here is what I came up. It was quite challenging due to my time constraints with work and family. This app works as a proof of concept, however I have described a few improvements that I would like to do if I had more time.
 
 ## Objective
 Design a campsite reservation system using a REST API design.
